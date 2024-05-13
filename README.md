@@ -1,5 +1,7 @@
-#
+## Setup
 
+- run npm install in mockup-server folder
+- run npm install in project root
 
 1. copy env-example.local to .env.local
 2. start mockup server: npm run mockup-server

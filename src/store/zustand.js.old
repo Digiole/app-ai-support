@@ -1,0 +1,172 @@
+import { create } from 'zustand';
+import ItemSelector from './ItemSelector.js';
+
+//import FeatureExtraction from "@/extract";
+//import text from "https://cdn.skypack.dev/@mediapipe/tasks-text@0.10.0";
+import text from "https://cdn.skypack.dev/@mediapipe/tasks-text@0.10.0";
+const { TextEmbedder, FilesetResolver } = text;
+//"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@0.10.0/wasm"
+async function createEmbedder() {
+  const textFiles = await FilesetResolver.forTextTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@0.10.0/wasm"
+  );
+  return await TextEmbedder.createFromOptions(textFiles, {
+    baseOptions: {
+      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/text_embedder/universal_sentence_encoder/float32/1/universal_sentence_encoder.tflite`
+    },
+    l2Normalize: true
+    //quantize: true
+  });
+
+}
+
+export const useVectorStore = create((set, get) => ({
+  textEmbedder: undefined,
+  /*  cosineSimilarity: (a, b) => {
+     return TextEmbedder.cosineSimilarity(
+       a,
+       b
+     );
+   }, */
+  cosineSimilarity: (a, b) => {
+    return ItemSelector.cosineSimilarity(
+      a,
+      b
+    );
+  },
+  initTextEmbedder: async () => {
+    const textEmbedder = get().textEmbedder;
+    if (textEmbedder === undefined) {
+      const initTextEmbedder = await createEmbedder();
+      set({ textEmbedder: initTextEmbedder });
+
+    }
+  },
+  featureExtraction: async (txt) => {
+
+    const cleanedText = txt.replace(/ {2,}/g, '').replace(/\n/g, " ");
+    const textEmbedder = get().textEmbedder;
+
+    return textEmbedder.embed(cleanedText);
+
+
+  },
+  itemCount: 0,
+  items: [],
+  /* add: () => set((state) => ({ cart: state.cart + 1 })),
+  remove: () => set((state) => ({ cart: state.cart - 1 })),
+  removeAll: () => set({ cart: 0 }), */
+  getItems: () => get().items,
+  getLastItem: () => {
+    const items = get().items;
+
+    let lastItem;
+
+    if (items.length > 0) {
+      lastItem = items[items.length - 1].metadata;
+    } else {
+      lastItem = null; // or some default value
+    }
+    return lastItem;
+  },
+  insert: async (item) => {
+    //   const textEmbedder = get().textEmbedder;
+    const inputVector = await get().featureExtraction(item.text);
+    item.vector = inputVector.embeddings[0].floatEmbedding;
+    if (item?.metadata === undefined) {
+      item.metadata = {};
+    }
+    const items = get().itemCount;
+    item.metadata.index = items + 1;
+
+    const newItem = { ...item };
+    set((state) => ({
+      items: [...state.items, newItem],
+      itemCount: items + 1
+    }))
+
+    /*  const inputVector = await FeatureExtraction(item.text);
+     item.vector = inputVector.embeddings[0].floatEmbedding;
+     const norm = ItemSelector.normalize(item.vector);
+     if (item?.metadata === undefined) {
+       item.metadata = {};
+     }
+     const items = get().itemCount;
+     item.metadata.index = items + 1;
+ 
+     const newItem = { ...item, norm };
+ 
+     set((state) => ({
+       items: [...state.items, newItem],
+       itemCount: items + 1
+     })) */
+  },
+  delete: (index) =>
+    set((state) => {
+      const copiedItems = [...state.items]
+      copiedItems.splice(index, 1)
+      return { items: copiedItems }
+    }),
+  update: (index, item) =>
+    set((state) => {
+      const copiedItems = [...state.items]
+      copiedItems[index] = { ...copiedItems[index], ...item }
+      return { items: copiedItems }
+    }),
+  semanticSearch: async ({ text, score, filter, topK }) => {
+    console.log("SEARCH ", text, score, filter, topK);
+    const embbedings = await get().featureExtraction(text);
+
+    const vector = embbedings.embeddings[0].floatEmbedding;
+    let items = get().items;
+    if (filter) {
+      items = items.filter(i => ItemSelector.select(i.metadata, filter));
+    }
+
+    const distances = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const distance = ItemSelector.cosineSimilarity(vector, item.vector);
+      //console.log("DISTANCE ", distance, i);
+      if (distance > score) {
+        distances.push({ index: i, distance: distance });
+      }
+    }
+    /* 
+    const embbedings = await FeatureExtraction(text);
+    const vector = embbedings.embeddings[0].floatEmbedding;
+    let items = get().items;
+    if (filter) {
+      items = items.filter(i => ItemSelector.select(i.metadata, filter));
+    }
+    const norm = ItemSelector.normalize(vector);
+    const distances = [];
+    //const items = get().items;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const distance = ItemSelector.normalizedCosineSimilarity(vector, norm, item.vector, item.norm);
+      distances.push({ index: i, distance: distance });
+    } */
+
+    //console.log("DISTANCES START ", distances);
+    // Sort by distance DESCENDING
+    distances.sort((a, b) => b.distance - a.distance);
+    //const top = distances.filter(d => (d.distance > score)).map(m => {
+    const top = distances.slice(0, topK).map(m => {
+      return {
+        item: Object.assign({}, items[m.index]),
+        score: Number(m.distance.toFixed(2))
+      };
+
+    });
+    /*  // Find top k
+     const top = distances.slice(0, topK).map(d => {
+       return {
+         item: Object.assign({}, items[d.index]),
+         score: d.distance.toFixed(2)
+       };
+ 
+     }); */
+    return top;
+  }
+}));

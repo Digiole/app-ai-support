@@ -1,7 +1,7 @@
 NEXT_PUBLIC_APP_ID=ai-support
 NEXT_PUBLIC_CONTENT_LANGUAGE=en
 
-MIDDLEWARE_API_URL=http://localhost:3330/api/v1/
+MIDDLEWARE_API_URL=http://localhost:3000/api/v1/
 
 APP_ID=ai-support
 
@@ -11,5 +11,4 @@ MY_REGION=eu-west-1
 MY_ACCESS_KEY=ACCESS-KEY
 MY_SECRET_KEY=SECRET-KEY
 AI_SUPPORT_USERS_TABLE=ai-support-users
-
-just testing how this works
+NEXT_PUBLIC_APP_DEV=true

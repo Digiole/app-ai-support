@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-
+import { useRouter } from 'next/router';
 import {
   Box,
   CloseButton,
@@ -16,6 +16,7 @@ import {
   FiStar, 
   FiMenu, */
   FiSettings,
+  FiTool,
 } from 'react-icons/fi'
 
 //import styled from "@emotion/styled";
@@ -40,15 +41,17 @@ const LinkItems = [
    { name: 'Explore', icon: FiCompass },
    { name: 'Favourites', icon: FiStar }, */
   { name: 'Settings', icon: FiSettings, component: <Settings /> },
+  { name: 'Studio', icon: FiTool, component: <Settings /> }
 ]
 
-const NavItem = ({ icon, children, ...rest }) => {
+const NavItem = ({ icon, children, onClick, ...rest }) => {
   return (
     <Box
       as="a"
-      href="#"
+      // href="#"
       style={{ textDecoration: 'none' }}
-      _focus={{ boxShadow: 'none' }}>
+      _focus={{ boxShadow: 'none' }}
+      onClick={onClick}>
       <Flex
         align="center"
         p="4"
@@ -85,6 +88,9 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
 
   const selectedComponent = useRef(null);
   //const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
+  const { username } = router.query;
+  //console.log("USER ", username);
 
   useEffect(() => {
     const handleEscape = (event) => {
@@ -126,6 +132,7 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
               //console.log("SIDEBAR CLICK ");
               selectedComponent.current = link.component;
               setShow(true);
+              router.push(`/${username}/studio/Profile`);
             }}>
               {link.name}
             </NavItem>

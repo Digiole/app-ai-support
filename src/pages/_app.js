@@ -2,11 +2,36 @@ import '@/styles/globals.css'
 import '@/styles/new-styles.css'
 import Head from 'next/head'
 
+import { useRouter } from 'next/router';
 import { main } from '../appConfig.js';
+import Profile from './[username]/studio/Profile';
+import KnowledgeBase from './[username]/studio/KnowledgeBase';
+import SessionHistory from './[username]/studio/SessionHistory';
 /* 
 import '@/styles/styles.css'
  */
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
+  const path = router.pathname;
+
+  let RenderComponent = Component;
+
+  // Route-specific component rendering for Studio pages
+  if (path.startsWith('/[username]/studio')) {
+    switch (path) {
+      case '/[username]/studio/profile':
+        RenderComponent = Profile;
+        break;
+      case '/[username]/studio/knowledgebase':
+        RenderComponent = KnowledgeBase;
+        break;
+      case '/[username]/studio/session-history':
+        RenderComponent = SessionHistory;
+        break;
+      default:
+        RenderComponent = Component;
+    }
+  }
   //console.log("COMPONENTS _app")
   return <>
     <Head>

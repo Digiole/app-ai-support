@@ -13,7 +13,7 @@ export default function Settings() {
   const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
     useNumberInput({
       step: 0.05,
-      defaultValue: settings.scoreLimit.default,
+      defaultValue: settings.scoreLimit?.default,
       min: settings.scoreLimit.min,
       max: settings.scoreLimit.max,
       precision: 2,

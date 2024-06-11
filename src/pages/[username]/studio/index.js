@@ -1,26 +1,25 @@
 // src/pages/[username]/studio/index.js
 import React from 'react';
-import { Box, Flex, Heading, VStack, HStack, Avatar, Text, Switch, Spacer, Button } from '@chakra-ui/react';
+import { Box, Flex, Heading, VStack, HStack, Avatar, Text, Button, Spacer } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import Image from "next/image";
-import { FaUser, FaBook, FaHistory, FaLink, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaLink } from 'react-icons/fa';
 import { useState } from 'react';
 import ToggleButton from '@/pages/components/ToggleButton';
 import { Icon } from '@iconify/react';
 
 const linkItems = [
-  { name: 'Assistant Profile', icon: "profile", href: 'Profile' },
-  { name: 'Knowledge Base', icon: "knowledge_base", href: 'KnowledgeBase' },
-  { name: 'Session History', icon: "session_history", href: 'SessionHistory' }
+  { name: 'Assistant Profile', icon: "mdi:account-circle-outline", href: 'Profile' },
+  { name: 'Knowledge Base', icon: "solar:library-line-duotone", href: 'KnowledgeBase' },
+  { name: 'Session History', icon: "material-symbols:history", href: 'SessionHistory' }
 ];
 
 const SidebarHeader = () => {
   return (
-    <Box bg="#C0C6C7" padding="8px 16px" alignItems="center" width="240px" height="60px"
-    >
-      <Flex align="center" justify="center">
-        <Image priority src="../../../../public/assets/AIAssistantStudio.svg" alt="Logo" width={48} height={48} />
+    <Box bg="#C0C6C7" padding="8px 16px" alignItems="center" width="240px" height="60px">
+      <Flex align="center">
+        <Image priority src="/assets/AIAssistantStudio.svg" alt="Logo" width={48} height={48} />
         <Heading size="md" ml="12px" fontFamily="DM Sans" fontWeight="700" fontSize="16px" color="#1D3437">AI Assistant Studio</Heading>
       </Flex>
     </Box>
@@ -33,6 +32,7 @@ const StatusSection = () => {
   const handleToggle = () => {
     setIsOnline(!isOnline);
   };
+
   return (
     <Box bg="#DEE1E2" p="4" display="flex" flexDirection="column" gap="4" width="240px">
       <HStack spacing="3" alignItems="flex-end">
@@ -69,7 +69,7 @@ const StatusSection = () => {
       </HStack>
       <HStack justifyContent="space-between" alignItems="center" width="full" padding="4px 0">
         <Text fontSize="sm" fontWeight="500" color="#0E2629">Assistant Status:</Text>
-        <ToggleButton isOnline={true} onToggle={handleToggle} />
+        <ToggleButton isOnline={isOnline} onToggle={handleToggle} />
       </HStack>
       <HStack spacing="4">
         <Button leftIcon={<FaExternalLinkAlt />} colorScheme="blue" variant="solid" size="sm" width="full" bg="#F5F6F6" borderRadius="8px" color="#0E2629">
@@ -80,8 +80,8 @@ const StatusSection = () => {
         </Button>
       </HStack>
     </Box>
-  )
-}
+  );
+};
 
 const Sidebar = () => {
   const router = useRouter();
@@ -89,38 +89,32 @@ const Sidebar = () => {
   const [selected, setSelected] = useState(tab || 'profile');
 
   return (
-    <Flex direction="column"
-      w="240px"
-      bg="#F5F6F6"
-      top="108px"
-      left="0px" 
-      >
+    <Flex direction="column" w="240px" bg="#F5F6F6" height="100vh" position="fixed" top="0" left="0">
       <SidebarHeader />
-      <VStack align="start" spacing="2" gap="8px">
-        {linkItems.map((link, index) => (
-          <Flex  key={link.name} flexDirection="row" alignItems="center" p="0">
-            <NextLink href={`/${username}/studio/${link.href}`}>
-              <HStack
-              p="3"
-              w="100%"
-              bg={selected === link.href ? 'gray.300' : 'transparent'}
-              borderRadius="md"
+      <VStack align="start" spacing="2" gap="8px" flex="1" overflowY="auto">
+        {linkItems.map((link) => (
+          <NextLink key={link.name} href={`/${username}/studio/${link.href}`}>
+            <Flex
+              flexDirection="row"
+              alignItems="center"
+              p="8px 12px"
+              gap="8px"
+              w="208px"
+              h="40px"
+              bg={selected === link.href ? 'rgba(0, 0, 0, 0.08)' : 'transparent'}
+              borderRadius="6px"
+              boxShadow={selected === link.href ? 'inset 0px 2px 4px rgba(0, 0, 0, 0.06)' : 'none'}
               cursor="pointer"
-              _hover={{ bg: 'gray.200' }}
+              _hover={{ bg: 'rgba(0, 0, 0, 0.08)' }}
               onClick={() => setSelected(link.href)}
             >
-                {link.icon == "profile" && <Icon icon="mdi:account-circle-outline"  style={{color: '#0e2629'}} />}
-                {link.icon == "knowledge_base" && <Icon icon="solar:library-line-duotone"  style={{color: '#0e2629'}} />}
-                {link.icon == "session_history" && <Icon icon="material-symbols:history"  style={{color: '#0e2629'}} />}
-                <Text>{link.name}</Text>
-                {selected === link.href && <Box as="span" ml="auto">➡️</Box>}
-              </HStack>
-            </NextLink>
-          </Flex>
+              <Icon icon={link.icon} style={{ color: '#0e2629', width: '20.67px', height: '20.67px' }} />
+              <Text>{link.name}</Text>
+              {selected === link.href && <Box as="span" ml="auto">➡️</Box>}
+            </Flex>
+          </NextLink>
         ))}
       </VStack>
-      <Spacer />
-
       <StatusSection />
     </Flex>
   );
@@ -130,7 +124,7 @@ const Studio = ({ children }) => {
   return (
     <Flex>
       <Sidebar />
-      <Box flex="1" p="4">
+      <Box flex="1" ml="240px" height="100vh" overflowY="auto" p="4">
         {children}
       </Box>
     </Flex>

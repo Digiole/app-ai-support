@@ -1,6 +1,6 @@
 // src/pages/[username]/studio/index.js
 import React from 'react';
-import { Box, Flex, Heading, VStack, HStack, Avatar, Text, Button, Spacer } from '@chakra-ui/react';
+import { Box, Flex, Heading, VStack, HStack, Avatar, Text, Button, Spacer, ChakraProvider } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import Image from "next/image";
@@ -122,12 +122,15 @@ const Sidebar = () => {
 
 const Studio = ({ children }) => {
   return (
-    <Flex>
+    <ChakraProvider>
+      <Flex>
       <Sidebar />
       <Box flex="1" ml="240px" height="100vh" overflowY="auto" p="4">
         {children}
       </Box>
     </Flex>
+    </ChakraProvider>
+    
   );
 };
 

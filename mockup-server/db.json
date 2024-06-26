@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "name": "Rui",
+    "headline": "AI Assistant by Digiole",
+    "status": "online",
+    "publicLink": "https://get-ai.support/digiole",
+    "description": "Example: as a senior business strategist, I am happy to assist with any questions or concerns. Please feel free to reach out via chat or conversation.",
+    "personalization": "Example: as a senior business strategist, I am happy to assist with any questions or concerns. Please feel free to reach out via chat or conversation."
+  },
+  "sidebarLinks": [
+    {
+      "name": "Assistant Profile",
+      "icon": "mdi:account-circle-outline",
+      "href": "Profile"
+    },
+    {
+      "name": "Knowledge Base",
+      "icon": "solar:library-line-duotone",
+      "href": "KnowledgeBase"
+    },
+    {
+      "name": "Session History",
+      "icon": "material-symbols:history",
+      "href": "SessionHistory"
+    }
+  ]
+}

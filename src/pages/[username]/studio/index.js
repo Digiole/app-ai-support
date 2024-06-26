@@ -5,15 +5,11 @@ import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import Image from "next/image";
 import { FaExternalLinkAlt, FaLink } from 'react-icons/fa';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ToggleButton from '@/pages/components/ToggleButton';
 import { Icon } from '@iconify/react';
-
-const linkItems = [
-  { name: 'Assistant Profile', icon: "mdi:account-circle-outline", href: 'Profile' },
-  { name: 'Knowledge Base', icon: "solar:library-line-duotone", href: 'KnowledgeBase' },
-  { name: 'Session History', icon: "material-symbols:history", href: 'SessionHistory' }
-];
+import { fetchProfile } from '@/pages/utils/Profile';
+import { fetchLinks } from '@/pages/utils/Links';
 
 const SidebarHeader = () => {
   return (
@@ -26,7 +22,7 @@ const SidebarHeader = () => {
   );
 };
 
-const StatusSection = () => {
+const StatusSection = ( { profile } ) => {
   const [isOnline, setIsOnline] = useState(true);
 
   const handleToggle = () => {
@@ -38,7 +34,7 @@ const StatusSection = () => {
       <HStack spacing="3" alignItems="flex-end">
         <Box width="48px" height="48px" position="relative">
           <Avatar src="/path-to-avatar-image.png" size="full" />
-          <Box
+          { isOnline ? <Box
             position="absolute"
             top="0"
             left="0"
@@ -48,7 +44,18 @@ const StatusSection = () => {
             borderRadius="full"
             backgroundImage="url(/path-to-avatar-image.png)"
             backgroundBlendMode="lighten"
-          />
+          /> : 
+          <Box
+            position="absolute"
+            top="0"
+            left="0"
+            width="100%"
+            height="100%"
+            border="4px solid #768486"
+            borderRadius="full"
+            backgroundImage="url(/path-to-avatar-image.png)"
+            backgroundBlendMode="lighten"
+          /> }
           <Box
             position="absolute"
             bottom="0"
@@ -63,8 +70,8 @@ const StatusSection = () => {
           </Box>
         </Box>
         <VStack alignItems="flex-start" spacing="1">
-          <Text fontSize="md" fontWeight="500" color="#0E2629">Mel</Text>
-          <Text fontSize="xs" fontWeight="400" color="#3B4F52">AI Assistant by Digiole</Text>
+          <Text fontSize="md" fontWeight="500" color="#0E2629">{profile.name}</Text>
+          <Text fontSize="xs" fontWeight="400" color="#3B4F52">{profile.headline}</Text>
         </VStack>
       </HStack>
       <HStack justifyContent="space-between" alignItems="center" width="full" padding="4px 0">
@@ -83,7 +90,7 @@ const StatusSection = () => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ( {profile, linkItems} ) => {
   const router = useRouter();
   const { username, tab } = router.query;
   const [selected, setSelected] = useState(tab || 'profile');
@@ -115,16 +122,27 @@ const Sidebar = () => {
           </NextLink>
         ))}
       </VStack>
-      <StatusSection />
+      <StatusSection profile={profile}/>
     </Flex>
   );
 };
 
 const Studio = ({ children }) => {
+  const [profile, setProfile] = useState({});
+  const [linkItems, setLinkItems] = useState([])
+  useEffect(() => {
+    const loadContents = async () => {
+      const profile_res = await fetchProfile();
+      const links_res = await fetchLinks();
+      setLinkItems(links_res)
+      setProfile(profile_res);
+    };
+    loadContents();
+  }, []);
   return (
     <ChakraProvider>
       <Flex>
-      <Sidebar />
+      <Sidebar profile={profile} linkItems={linkItems}/>
       <Box flex="1" ml="240px" height="100vh" overflowY="auto" p="4">
         {children}
       </Box>

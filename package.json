@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "test:e2e": "playwright test",
-    "mockup-server": "node ./mockup-server/server.js"
+    "mockup-server": "node ./mockup-server/server.js",
+    "mockup-server-dev": "nodemon ./mockup-server/server.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
@@ -35,6 +36,7 @@
     "@iconify-icon/react": "^2.1.0",
     "@iconify/react": "^5.0.1",
     "eslint": "^8.39.0",
-    "eslint-config-next": "^14.0.0"
+    "eslint-config-next": "^14.0.0",
+    "nodemon": "^3.1.4"
   }
 }

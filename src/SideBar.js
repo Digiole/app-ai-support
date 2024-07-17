@@ -4,8 +4,10 @@ import {
   Box,
   CloseButton,
   Flex,
+  HStack,
   Icon,
   useColorModeValue,
+  Switch 
 } from '@chakra-ui/react'
 
 
@@ -39,7 +41,12 @@ const LinkItems = [
    { name: 'Trending', icon: FiTrendingUp },
    { name: 'Explore', icon: FiCompass },
    { name: 'Favourites', icon: FiStar }, */
-  { name: 'Settings', icon: FiSettings, component: <Settings /> },
+  { name: 'About', icon: null, component: <Settings /> },
+  { name: 'Personalization', icon: null, component: <Settings /> },
+  { name: 'Disclaimer', icon: null, component: <Settings /> },
+  { name: 'Term of use', icon: null, component: <Settings /> },
+  { name: 'Privacy Policy', icon: null, component: <Settings /> },
+  // { name: 'Dark mode', icon: null, component: <Settings /> },
 ]
 
 const NavItem = ({ icon, children, ...rest }) => {
@@ -131,6 +138,25 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
             </NavItem>
           ))
         }
+        <Box
+          style={{ textDecoration: 'none' }}
+          _focus={{ boxShadow: 'none' }}>
+          <HStack>
+            <Flex
+              align="center"
+              p="4"
+              mx="4"
+              borderRadius="lg"
+              role="group"
+              cursor="pointer"
+            >
+              Dark mode
+            </Flex>
+            <Flex >
+              <Switch id="darkModeSwitch" />
+            </Flex>
+          </HStack>
+        </Box>
       </>
       }
       {show && <>

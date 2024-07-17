@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef } from "react";
 
 import {
-  Flex, Textarea, HStack, IconButton
+  Flex, Textarea, HStack, IconButton, Center, VStack, Spacer 
 } from '@chakra-ui/react'
 
 import { FiSend } from "react-icons/fi";
@@ -45,38 +45,43 @@ const Footer = forwardRef(({ newMessage, onMounted }, ref) => {
   }, []);
   return (
 
-    <HStack style={{ border: "none", borderLeft: "1px solid", borderTop: "1px solid", borderBottom: "1px solid", borderColor: `${themeColor}`, borderRadius: "8px" }}>
+      <Center bg='#FAFAFB' height="130px" >
+      <VStack>
+        {/* <HStack style={{ border: "none", borderLeft: "1px solid", borderTop: "1px solid", borderBottom: "1px solid", borderColor: `${themeColor}`, borderRadius: "8px" }}> */}
+        <HStack>
+          <Flex className="messageInputs" width="894px">
 
-      <Flex className="messageInputs">
+            <Textarea w={"100%"} data-status="ready" data-testid="statement" ref={mergedRef} resize={"none"} maxHeight={"250px"} minHeight={`${EVALS.defaultHeight}px`} h={`${EVALS.defaultHeight}px`}
+            onKeyDown={e => {
 
-        <Textarea w={"100%"} data-status="ready" data-testid="statement" ref={mergedRef} resize={"none"} maxHeight={"250px"} minHeight={`${EVALS.defaultHeight}px`} h={`${EVALS.defaultHeight}px`}
-          onKeyDown={e => {
-
-            if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                console.log("keydown... ", e.key, e.shiftKey);
+                if (ref.current.value !== "") {
+                  newMessage(e);
+                }
+              }
+              }}
+              maxLength={600} 
+              placeholder="Type your question here ..."
+            />
+            <Flex width="18px"></Flex>
+            <Flex alignItems={"center"} justifyContent={"center"} className="btn" id="send-question" onClick={(e) => {
               e.preventDefault();
-              console.log("keydown... ", e.key, e.shiftKey);
+
               if (ref.current.value !== "") {
                 newMessage(e);
               }
-
-            }
-          }}
-          maxLength={600}
-        />
-
-
-        <Flex alignItems={"center"} justifyContent={"center"} style={{ backgroundColor: `${themeColor}` }} className="btn" id="send-question" onClick={(e) => {
-          e.preventDefault();
-
-          if (ref.current.value !== "") {
-            newMessage(e);
-          }
-        }}>
-          <IconButton variant={"customIconButton"} icon={<FiSend style={{ width: "1.5em", height: "1.5em" }} />} />
-          {/*   <StyledSendSvg /> */}
-        </Flex>
-      </Flex>
-    </HStack>
+            }}>
+              <IconButton variant={"customIconButton"} icon={<FiSend style={{ width: "1.5em", height: "1.5em" }} />} />
+            {/*   <StyledSendSvg /> */}
+            </Flex>
+          </Flex>
+          
+        </HStack>
+        <Flex textColor="#C0C6C7">Powered by Digiole</Flex>
+      </VStack>
+    </Center>
   );
 });
 

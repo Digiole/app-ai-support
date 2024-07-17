@@ -43,7 +43,8 @@ function UserPage() {
   const { username } = router.query;
   //console.log("USER ", username);
   const [haveAnswer, setHaveAnswer] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile] = useMediaQuery('(max-width: 768px)');
 
 
@@ -138,6 +139,7 @@ function UserPage() {
     ref: sideBar,
     handler: () => {
       if (sideBar.current !== null && sideBar.current !== undefined) {
+        setSidebarOpen(false);
         onClose();
       }
     }
@@ -629,20 +631,25 @@ function UserPage() {
         </Head>}
       {!state.errors &&
         <HStack gap={"0px"}>
-          {/* 
-          {isOpen && <>
+          
+          {isSidebarOpen  && <>
             <AppContext.Provider value={providerValue}>
-              {!isMobile && <Box ref={sideBar} w={EVALS.sideBarWidth} className="sidebar" >
+              {/* {!isMobile && <Box ref={sideBar} w={EVALS.sideBarWidth} className="sidebar" >
                 <Box mb={"20px"} pl={[0, 5, 5, 5]}>
-                  <IconButton icon={<HamburgerIcon boxSize={"1.7em"} onClick={onClose} />} />
                 </Box>
-                <Sidebar onClose={onClose} />
+                <Sidebar onClick={() => { setSidebarOpen(false); onClose(); }} />
 
               </Box>}
-              {isMobile && <MobileSideBar onClose={onClose} isOpen={isOpen} />}
+              {isMobile && <MobileSideBar onClick={() => { setSidebarOpen(false); onClose(); }} isOpen={isSidebarOpen} />} */}
+              <Box ref={sideBar} w={EVALS.sideBarWidth} className="sidebar" >
+                <Box mb={"20px"} pl={[0, 5, 5, 5]}>
+                </Box>
+                <Sidebar onClick={() => { setSidebarOpen(false); onClose(); }} />
+
+              </Box>
             </AppContext.Provider>
           </>
-          } */}
+          }
           <Grid
             templateAreas={`"header"
                   "main"
@@ -656,8 +663,14 @@ function UserPage() {
           >
 
             <GridItem area={'header'}>
-              {/*   <Header isMobile={isMobile} onClose={onClose} isOpen={isOpen} onOpen={onOpen} /> */}
+                <Header isMobile={isMobile} onClose={onClose} isOpen={isOpen} onOpen={onOpen} />
               <Header isMobile={isMobile} onClose={onClose} onOpen={onOpen} />
+              { !isSidebarOpen && <>
+                <IconButton icon={<HamburgerIcon boxSize={"1.7em"} />} onClick={() => { setSidebarOpen(true); onOpen(); }} />
+              </> }
+              { isSidebarOpen && <>
+                <IconButton icon={<HamburgerIcon boxSize={"1.7em"} onClick={() => { setSidebarOpen(false); onClose(); }} />} />
+              </> }
             </GridItem>
             <GridItem area={'main'} className="content" ml={[0, 5]}>
               <div className="messages">

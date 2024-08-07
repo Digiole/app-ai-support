@@ -3,10 +3,10 @@ import { useRouter } from 'next/router';
 import { useEffect, useState, useRef, useReducer, useCallback } from 'react';
 
 import {
-  Flex, Grid, GridItem, useToast, Alert, AlertIcon, Center, VStack, Text, AbsoluteCenter, useOutsideClick, useMediaQuery, useDisclosure, Textarea, Avatar, ChakraProvider, Card, CardBody, HStack, Box, IconButton
+  Flex, Grid, GridItem, useToast, Alert, AlertIcon, Center, VStack, Text, AbsoluteCenter, useOutsideClick, useMediaQuery, useDisclosure, Textarea, Avatar, ChakraProvider, Card, CardBody, HStack, Box, IconButton, Button
 } from '@chakra-ui/react'
 
-import { HamburgerIcon } from '@chakra-ui/icons'
+import { HamburgerIcon, CopyIcon, CheckIcon } from '@chakra-ui/icons'
 
 import MobileSideBar from "@/MobileSideBar";
 import Sidebar from "@/SideBar";
@@ -17,6 +17,7 @@ import Footer from "@/Footer";
 import Welcome from "@/Welcome";
 import { AppContext } from "@/contexLib";
 import autosize from 'autosize';
+import { useClipboard } from '@chakra-ui/react';
 
 //import { v4 as uuidv4 } from 'uuid';
 import { newExample } from "@/utils/getExample";
@@ -46,6 +47,8 @@ function UserPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const { onCopy, value, setValue, hasCopied } = useClipboard('');
+  const [copied, setCopied] = useState(false);
 
 
   const scrollSpan = useRef();
@@ -145,6 +148,27 @@ function UserPage() {
     }
   });
 
+  useEffect(() => {
+    if (hasCopied) {
+      setCopied(true);
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasCopied]);
+
+  useEffect(() => {
+    if (value) {
+      onCopy();
+    }
+  }, [value]);
+
+  const handleCopy = (message) => {
+    setValue(message.answer);
+    onCopy();
+    setCopied(true);
+  };
 
   useEffect(() => {
     if (haveAnswer) {
@@ -615,6 +639,7 @@ function UserPage() {
   if (state.loading && !state.errors) {
     return <div>Loading...</div>;
   }
+  console.log(messageList)
 
   return (
     <ChakraProvider theme={theme}>
@@ -672,7 +697,7 @@ function UserPage() {
                 <IconButton icon={<HamburgerIcon boxSize={"1.7em"} onClick={() => { setSidebarOpen(false); onClose(); }} />} />
               </> }
             </GridItem>
-            <GridItem area={'main'} className="content" ml={[0, 5]}>
+            <GridItem area={'main'} className="content" ml={[0, 5]} px={[0, 5, '15%']} >
               <div className="messages">
                 {messageList.map((message, key) => {
                   return (
@@ -722,6 +747,7 @@ function UserPage() {
                                 </>
                                 }
                               </Box>
+                              <IconButton position="absolute" bottom="8px" right="8px" id={message[1].uniqueId} onClick={() => handleCopy(message[1])} icon={<CopyIcon/>}></IconButton>
                             </Box>
                             {/* 
                           <Box w={"100%"}>{message[1]}</Box>

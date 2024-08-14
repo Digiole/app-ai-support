@@ -61,11 +61,18 @@ const theme = extendTheme({
 })
  */
 
+// console.log("nextFont.style.fontFamily: ",nextFont.style.fontFamily);
+// console.log(nextFont.style.fontFamily);
+
+const isStorybook = process.env.STORYBOOK === 'true';
+
 export const theme = extendTheme({
   // Set the fonts like this
   fonts: {
-    body: nextFont.style.fontFamily,
-    heading: nextFont.style.fontFamily,
+    // body: nextFont.style.fontFamily,
+    // heading: nextFont.style.fontFamily,
+    body: isStorybook ? "Arial, sans-serif" : nextFont.style.fontFamily,
+    heading: isStorybook ? "Arial, sans-serif" : nextFont.style.fontFamily,
   },
   components: { Button: buttonTheme },
 });

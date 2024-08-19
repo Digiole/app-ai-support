@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import cors from 'cors';
+import multer from 'multer';
 
 import { Readable } from 'stream';
 
@@ -23,10 +24,25 @@ app.use(cors({
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dbFilePath = path.join(__dirname, 'db.json');
-console.log(dbFilePath);
+const uploadsDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+
 const readData = () => {
   const data = fs.readFileSync(dbFilePath, 'utf-8');
-  console.log(data);
   return JSON.parse(data);
 };
 
@@ -49,6 +65,40 @@ app.put('/api/v1/profile', (req, res) => {
   data.profile = { ...data.profile, ...req.body };
   writeData(data);
   res.status(200).json(data.profile);
+});
+
+app.get('/api/v1/files', (req, res) => {
+  fs.readdir(uploadsDir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to read files', err });
+    }
+    res.status(200).json(files);
+  });
+});
+
+app.post('/api/v1/upload', upload.single('file'), (req, res) => {
+  const file = req.file;
+  if (file) {
+    res.status(201).json({
+      message: 'File uploaded successfully',
+      file: {
+        filename: file.filename,
+        originalname: file.originalname,
+      },
+    });
+  } else {
+    res.status(400).json({ message: 'File upload failed' });
+  }
+});
+
+app.delete('/api/v1/files/:filename', (req, res) => {
+  const { filename } = req.params;
+  fs.unlink(path.join(uploadsDir, filename), (err) => {
+    if (err) {
+      return res.status(500).json({ message: 'File deletion failed', err });
+    }
+    res.status(200).json({ message: 'File deleted successfully' });
+  });
 });
 
 app.post('/api/v1/examples', (req, res) => {

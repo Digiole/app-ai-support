@@ -38,3 +38,6 @@ output.tro
 env-vars.json
 /test-results
 /videos
+
+/uploads
+db.json

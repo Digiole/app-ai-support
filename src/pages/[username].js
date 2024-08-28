@@ -701,7 +701,6 @@ function UserPage() {
               <div className="messages">
                 {messageList.map((message, key) => {
                   return (
-
                     <div key={"chats-" + key} >
                       <div className="messageContainer" key={"chat-" + key} >
 
@@ -747,7 +746,7 @@ function UserPage() {
                                 </>
                                 }
                               </Box>
-                              <IconButton position="absolute" bottom="8px" right="8px" id={message[1].uniqueId} onClick={() => handleCopy(message[1])} icon={<CopyIcon/>}></IconButton>
+                              <IconButton position="absolute" bottom="8px" right="8px" id={message[1].uniqueId} onClick={() => handleCopy(message[1])} icon={<CopyIcon/>} display={["none", "none", "inline-flex"]}></IconButton>
                             </Box>
                             {/* 
                           <Box w={"100%"}>{message[1]}</Box>

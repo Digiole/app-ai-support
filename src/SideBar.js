@@ -7,7 +7,9 @@ import {
   HStack,
   Icon,
   useColorModeValue,
-  Switch 
+  Switch, 
+  useColorMode, 
+  useOutsideClick 
 } from '@chakra-ui/react'
 
 
@@ -55,7 +57,9 @@ const NavItem = ({ icon, children, ...rest }) => {
       as="a"
       href="#"
       style={{ textDecoration: 'none' }}
-      _focus={{ boxShadow: 'none' }}>
+      _focus={{ boxShadow: 'none' }}
+      onClick={(e) => e.stopPropagation()}
+    >
       <Flex
         align="center"
         p="4"
@@ -92,6 +96,8 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
 
   const selectedComponent = useRef(null);
   //const { isOpen, onOpen, onClose } = useDisclosure();
+  const sideBarRef = useRef(null);
+  const { colorMode, toggleColorMode } = useColorMode();
 
   useEffect(() => {
     const handleEscape = (event) => {
@@ -107,6 +113,15 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
     }
 
   }, [onClose]);
+
+  useOutsideClick({
+    ref: sideBarRef,
+    handler: (event) => {
+      if (sideBarRef.current && !sideBarRef.current.contains(event.target)) {
+        onClose();
+      }
+    },
+  });
 
   return (
     <Box
@@ -131,6 +146,7 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
           LinkItems.map((link) => (
             <NavItem key={link.name} icon={link.icon} onClick={() => {
               //console.log("SIDEBAR CLICK ");
+              e.stopPropagation();
               selectedComponent.current = link.component;
               setShow(true);
             }}>
@@ -140,7 +156,8 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
         }
         <Box
           style={{ textDecoration: 'none' }}
-          _focus={{ boxShadow: 'none' }}>
+          _focus={{ boxShadow: 'none' }} 
+        >
           <HStack>
             <Flex
               align="center"
@@ -148,12 +165,21 @@ export default function SideBar({ mobile = false, onClose, ...rest }) {
               mx="4"
               borderRadius="lg"
               role="group"
-              cursor="pointer"
+              cursor="pointer" 
+              onClick={(e) => {
+                e.stopPropagation(); 
+              }}
             >
               Dark mode
             </Flex>
-            <Flex >
-              <Switch id="darkModeSwitch" />
+            <Flex onClick={(e) => {
+              e.stopPropagation();  
+            }}>
+              <Switch id="darkModeSwitch" isChecked={colorMode === 'dark'} 
+              onChange={(e) => {
+                e.stopPropagation(); 
+                toggleColorMode();
+              }}/>
             </Flex>
           </HStack>
         </Box>
